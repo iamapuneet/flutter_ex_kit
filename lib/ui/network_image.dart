@@ -38,7 +38,6 @@ extension NetworkImageExt on String? {
     double? indicatorWidth,
     Widget? svgImage,
   }) {
-    FlutterExKit exKit = FlutterExKit();
 
     if (this != null && this?.isNotEmpty == true && allImages(this ?? '')) {
       return Image.network(
@@ -58,7 +57,7 @@ extension NetworkImageExt on String? {
                         loadingProgress.expectedTotalBytes!
                     : null,
                 strokeWidth: progressIndicatorSize ?? 4.0,
-                color: exKit.imageLoader,
+                color: exKitTheme.loadingImageColor,
               ),
             ),
           );
@@ -70,7 +69,7 @@ extension NetworkImageExt on String? {
             child: errorWidget ??
                 Icon(
                   Icons.broken_image,
-                  color: exKit.imageLoader,
+                  color: exKitTheme.loadingImageColor,
                 ),
           );
         },

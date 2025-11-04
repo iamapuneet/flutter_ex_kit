@@ -28,15 +28,20 @@ part of '../flutter_ex_kit.dart';
 /// The [paginationFunction] attaches a listener to the provided [ScrollController],
 /// which checks if the current scroll offset has reached the maximum scroll extent.
 /// When this condition is met, it calls the provided callback function [fun].
+bool _isPaginationLocked = false;
+
 void paginationFunction({
   required Function() fun,
   required ScrollController controller,
 }) {
-  controller.addListener(
-    () {
-      if (controller.position.maxScrollExtent == controller.offset) {
-        fun.call();
-      }
-    },
-  );
+  controller.addListener(() {
+    if (controller.position.maxScrollExtent == controller.offset && !_isPaginationLocked) {
+      _isPaginationLocked = true;
+      fun.call();
+      // Optional: Add a small delay to unlock or unlock after async completes
+      Future.delayed(Duration(milliseconds: 300), () {
+        _isPaginationLocked = false;
+      });
+    }
+  });
 }

@@ -1,45 +1,80 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+part of 'flutter_ex_kit.dart';
+/// Defines the theme configuration and global settings.
+class ExKitTheme {
+  static final ExKitTheme _instance = ExKitTheme._internal(); // ✅ Instance initialized immediately
 
-/// A singleton utility class that provides commonly used constants and configurations.
-///
-/// This class ensures a single instance throughout the application lifecycle.
-/// It includes logging configurations, UI-related properties, and utility values.
-class FlutterExKit {
-  /// Private static variable holding the single instance of [FlutterExKit].
-  static final FlutterExKit _instance = FlutterExKit._internal();
+  /// A prefix emoji string used in logs or debug outputs.
+  final String logStartEmoji;
 
-  /// Private constructor to prevent external instantiation.
-  FlutterExKit._internal();
+  /// A suffix emoji string used in logs or debug outputs.
+  final String logEndEmoji;
 
-  /// Factory constructor that returns the single instance of [FlutterExKit].
-  factory FlutterExKit() {
-    return _instance;
+  /// A font-family string used in logs or debug outputs.
+  final String fontFamily;
+
+  /// Enables or disables logging globally.
+  final bool logEnable;
+
+  /// The default text color used throughout the application.
+  final Color textColor;
+
+  /// The default color for loading images.
+  final Color loadingImageColor;
+
+  /// Private constructor for singleton implementation.
+  ExKitTheme._internal({
+    this.logStartEmoji = '🔥🔥🔥🔥🔥',
+    this.logEndEmoji = '🔥🔥🔥🔥🔥',
+    this.fontFamily = 'Euclid_Circular',
+    this.textColor = Colors.black,
+    this.loadingImageColor = Colors.black,
+    this.logEnable = true,
+  });
+
+  /// Factory constructor to return the singleton instance.
+  factory ExKitTheme() => _instance;
+
+  /// Returns a **new modified instance** of `ExKitTheme` without breaking immutability.
+  ExKitTheme copyWith({
+    String? logStartEmoji,
+    String? logEndEmoji,
+    String? fontFamily,
+    Color? textColor,
+    Color? loadingImageColor,
+    bool? logEnable,
+  }) {
+    return ExKitTheme._internal(
+      logStartEmoji: logStartEmoji ?? this.logStartEmoji,
+      logEndEmoji: logEndEmoji ?? this.logEndEmoji,
+      textColor: textColor ?? this.textColor,
+      fontFamily: fontFamily ?? this.fontFamily,
+      loadingImageColor: loadingImageColor ?? this.loadingImageColor,
+      logEnable: logEnable ?? this.logEnable,
+    );
   }
-
-  /// A log emoji used for debugging messages.
-  ///
-  /// Example usage:
-  /// ```dart
-  /// print('${FlutterExKit().logEmoji} Debug message');
-  /// ```
-  String get logEmoji => '💢💢💢💢💢💢';
-
-  /// A secondary log emoji used for emphasizing logs.
-  ///
-  /// Example usage:
-  /// ```dart
-  /// print('${FlutterExKit().logEmojiDown} Error message');
-  /// ```
-  String get logEmojiDown => '💯💯💯💯💯💯';
-
-  /// Determines whether logging is enabled.
-  ///
-  /// Logs are enabled only in debug mode (`kDebugMode`).
-  bool get logEnable => kDebugMode;
-
-  /// The default color used for image loaders.
-  ///
-  /// The color is set to black (`0xff000000`).
-  Color get imageLoader => const Color(0xff000000);
 }
+
+/// Singleton class to manage global theme
+class ExKitThemeManager {
+  static final ExKitThemeManager _instance = ExKitThemeManager._internal();
+
+  /// Notifier to update the theme across the app
+  final ValueNotifier<ExKitTheme> themeNotifier = ValueNotifier(ExKitTheme());
+
+  /// Private constructor
+  ExKitThemeManager._internal();
+
+  /// Factory constructor to get the singleton instance
+  factory ExKitThemeManager() => _instance;
+
+  /// Update theme globally
+  void updateTheme(ExKitTheme newTheme) {
+    themeNotifier.value = newTheme;
+  }
+}
+
+/// Update theme globally
+final exKit = ExKitThemeManager();
+
+/// ✅ Always use exKit.themeNotifier.value instead of a fixed copy
+ExKitTheme get exKitTheme => exKit.themeNotifier.value;

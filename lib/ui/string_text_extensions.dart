@@ -101,10 +101,10 @@ extension StringTextExtensions on String {
         this,
         key: key,
         style: TextStyle(
-          color: color,
+          color: color ?? exKitTheme.textColor,
           fontSize: fontSize,
           fontWeight: fontWeight,
-          fontFamily: fontFamily,
+          fontFamily: fontFamily ?? exKitTheme.fontFamily,
           fontFamilyFallback: fontFamilyFallback,
           fontStyle: fontStyle,
           letterSpacing: letterSpacing,

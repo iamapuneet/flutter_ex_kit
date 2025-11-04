@@ -18,12 +18,12 @@ part of '../flutter_ex_kit.dart';
 /// is not exposed in production logs.
 void output(Object? response) {
   // Accessing the singleton instance of ExKit
-  FlutterExKit exKit = FlutterExKit();
+  final exKit = ExKitThemeManager().themeNotifier.value;
 
   // Log the response with emojis, but only in debug mode
   if (exKit.logEnable) {
-    log(exKit.logEmoji);
+    log(exKit.logStartEmoji);
     log(response.toString());
-    log(exKit.logEmojiDown);
+    log(exKit.logEndEmoji);
   }
 }
