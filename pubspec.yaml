@@ -1,6 +1,6 @@
 name: flutter_ex_kit
 description: "A comprehensive Flutter extension suite and utility kit for BuildContext, widgets, spacing, navigation, strings, dates, and responsive UI."
-version: 0.0.7
+version: 0.0.8
 repository: https://github.com/iamapuneet/flutter_ex_kit
 issue_tracker: https://github.com/iamapuneet/flutter_ex_kit/issues
 homepage: https://puneetdev.in

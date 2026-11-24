@@ -1,3 +1,9 @@
+## 0.0.8
+
+- Updated package metadata, homepage (`https://puneetdev.in`), and official documentation URL (`https://docs.puneetdev.in/flutter/dependencies/flutter_ex_kit`).
+- Streamlined `README.md` with concise feature highlights and official documentation links.
+- Enhanced package discovery topics and GitHub Sponsors funding configuration.
+
 ## 0.0.7
 
 - Added comprehensive BuildContext extensions (`width`, `height`, `isDarkMode`, navigation, snackbars, keyboard).
