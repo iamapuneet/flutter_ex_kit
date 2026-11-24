@@ -80,7 +80,7 @@ jobs:
   publish_pub_dev:
     name: Publish to pub.dev
     needs: build_and_release
-    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish_to_pub == 'true'
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.event.inputs.publish_to_pub == 'true'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
