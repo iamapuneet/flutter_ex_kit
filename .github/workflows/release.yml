@@ -42,7 +42,9 @@ jobs:
         run: flutter test
 
       - name: Validate Package Quality
-        run: dart pub publish --dry-run
+        run: |
+          git checkout -- .
+          dart pub publish --dry-run
 
       - name: Extract Package Version
         id: get_version

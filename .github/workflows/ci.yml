@@ -39,4 +39,6 @@ jobs:
         run: flutter test --coverage
 
       - name: Validate pub.dev Publishing (Dry Run)
-        run: dart pub publish --dry-run
+        run: |
+          git checkout -- .
+          dart pub publish --dry-run

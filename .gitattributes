@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.dart text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.json text eol=lf
