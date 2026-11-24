@@ -1,12 +1,18 @@
 name: flutter_ex_kit
-description: "Ex Kit Flutter is a powerful and easy-to-use collection of extensions and utility functions designed to enhance your Flutter development experience."
+description: "A comprehensive Flutter extension suite and utility kit for BuildContext, widgets, spacing, navigation, strings, dates, and responsive UI."
 version: 0.0.7
-repository: https://github.com/iamapuneet/flutter_ex_kit.git
+repository: https://github.com/iamapuneet/flutter_ex_kit
 issue_tracker: https://github.com/iamapuneet/flutter_ex_kit/issues
-homepage: https://github.com/iamapuneet/flutter_ex_kit?tab=readme-ov-file#flutter_ex_kit
-documentation: https://github.com/iamapuneet/flutter_ex_kit.wiki.git
-topics: [flutter, extensions, utilities, development]
-#funding: [https://github.com/sponsors/realpuneetsharam]
+homepage: https://puneetdev.in
+documentation: https://docs.puneetdev.in/flutter/dependencies/flutter_ex_kit
+topics:
+  - extensions
+  - utilities
+  - ui
+  - navigation
+  - helper
+funding:
+  - https://github.com/sponsors/iamapuneet
 
 environment:
   sdk: ">=3.5.3 <4.0.0"
@@ -22,5 +28,5 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 screenshots:
-  - description: The flutter ex kit package logo.
+  - description: "flutter_ex_kit logo - Essential Flutter extensions and utility kit"
     path: screenshots/logo.png
