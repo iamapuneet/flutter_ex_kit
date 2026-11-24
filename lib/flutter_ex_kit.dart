@@ -4,6 +4,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Modular Exports (Must precede part directives in Dart)
+export 'collections/iterable_extensions.dart';
+export 'date_time/date_time_extensions.dart';
+export 'extensions/context_extensions.dart';
+export 'number/duration_extensions.dart';
+export 'number/int.dart';
+export 'string/string_ex.dart';
+export 'ui/widget_extensions.dart';
+export 'validation/input_format_validation.dart';
+export 'validation/single_space_formatter.dart';
+
 // UI Parts
 part 'ui/string_text_extensions.dart';
 part 'ui/scaffold_extensions.dart';
@@ -30,14 +41,3 @@ part 'animation/bottom_animation.dart';
 part 'enums/fade_in_animation_enum.dart';
 part 'enums/file_type_enum.dart';
 part 'single_ton.dart';
-
-// Modular Exports
-export 'collections/iterable_extensions.dart';
-export 'date_time/date_time_extensions.dart';
-export 'extensions/context_extensions.dart';
-export 'number/duration_extensions.dart';
-export 'number/int.dart';
-export 'string/string_ex.dart';
-export 'ui/widget_extensions.dart';
-export 'validation/input_format_validation.dart';
-export 'validation/single_space_formatter.dart';
