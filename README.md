@@ -32,20 +32,17 @@ flutter pub get
 
 In the traditional approach, you would write the code as follows:
 
-dart
-```
+```dart
 SizedBox(
   height: 10,
 ),
-
 ```
 
 **After using** `flutter_ex_kit`
 
 With the `flutter_ex_kit` package, you can simplify this code:
 
-dart
-```
+```dart
 10.height,
 ```
 
