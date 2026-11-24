@@ -6,30 +6,8 @@ part of '../flutter_ex_kit.dart';
 /// in from one of four possible directions: top-to-bottom (ttb), bottom-to-top (btt),
 /// left-to-right (ltr), or right-to-left (rtl). The animation duration and direction
 /// can be customized using the `delay`, `fadeOffset`, and `direction` parameters.
-///
-/// Example usage:
-/// ```dart
-/// FadeInAni(
-///   delay: 1.5,  // Adjusts the animation duration
-///   fadeOffset: 50.0,  // Controls how far the widget slides in
-///   direction: FadeInDirection.ltr,  // Animation direction: left-to-right
-///   child: YourWidget(),
-/// );
-/// ```
-///
-/// Parameters:
-/// - [child]: The widget to animate.
-/// - [delay]: A multiplier for the duration of the animation, where 1.0 is the normal speed.
-/// - [fadeOffset]: The distance the widget moves during the fade-in animation (in logical pixels).
-/// - [direction]: Specifies the direction from which the widget slides in. It can be one of the following:
-///   - `FadeInDirection.ltr`: Left to right.
-///   - `FadeInDirection.rtl`: Right to left.
-///   - `FadeInDirection.ttb`: Top to bottom.
-///   - `FadeInDirection.btt`: Bottom to top.
 class FadeInAni extends StatefulWidget {
   /// Creates a [FadeInAni] widget.
-  ///
-  /// Requires [child], [delay], [direction], and [fadeOffset] parameters.
   const FadeInAni({
     super.key,
     required this.child,
@@ -54,67 +32,63 @@ class FadeInAni extends StatefulWidget {
   State<FadeInAni> createState() => _FadeInAniState();
 }
 
-class _FadeInAniState extends State<FadeInAni> with TickerProviderStateMixin {
+class _FadeInAniState extends State<FadeInAni>
+    with SingleTickerProviderStateMixin {
   /// Controls the animation progress.
-  late AnimationController controller;
+  late final AnimationController controller;
 
   /// Controls the opacity transition.
-  late Animation<double> opacityAnimation;
+  late final Animation<double> opacityAnimation;
 
   /// Controls the slide transition based on [FadeInDirection].
-  late Animation<double> inAnimation;
+  late final Animation<double> inAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize the animation controller with a duration based on the delay value.
+    // Initialize controller and start animation safely in lifecycle
     controller = AnimationController(
       duration: Duration(milliseconds: (500 * widget.delay).round()),
       vsync: this,
     );
 
-    // Define the sliding animation using Tween and animate based on controller.
-    inAnimation =
-        Tween<double>(begin: -widget.fadeOffset, end: 0).animate(controller)
-          ..addListener(() {
-            setState(() {});
-          });
+    inAnimation = Tween<double>(begin: -widget.fadeOffset, end: 0).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeOut),
+    );
 
-    // Define the opacity animation, starting from 0 (invisible) and ending at 1 (fully visible).
-    opacityAnimation = Tween<double>(begin: 0, end: 1).animate(controller)
-      ..addListener(() {
-        setState(() {});
-      });
+    opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeIn),
+    );
+
+    controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Start the animation forward as soon as the widget is built.
-    controller.forward();
-
-    // Apply the animation transformations: translate and fade.
-    return Transform.translate(
-      offset: switch (widget.direction) {
-        FadeInDirection.ltr =>
-          Offset(inAnimation.value, 0), // Move from left to right
-        FadeInDirection.rtl =>
-          Offset(-inAnimation.value, 0), // Move from right to left
-        FadeInDirection.ttb =>
-          Offset(0, inAnimation.value), // Move from top to bottom
-        FadeInDirection.btt =>
-          Offset(0, -inAnimation.value), // Move from bottom to top
+    // Uses AnimatedBuilder instead of manual setState listeners for optimal performance
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: switch (widget.direction) {
+            FadeInDirection.ltr => Offset(inAnimation.value, 0),
+            FadeInDirection.rtl => Offset(-inAnimation.value, 0),
+            FadeInDirection.ttb => Offset(0, inAnimation.value),
+            FadeInDirection.btt => Offset(0, -inAnimation.value),
+          },
+          child: Opacity(
+            opacity: opacityAnimation.value.clamp(0.0, 1.0),
+            child: child,
+          ),
+        );
       },
-      child: Opacity(
-        opacity: opacityAnimation.value, // Apply fade-in effect
-        child: widget.child, // Display the animated widget
-      ),
+      child: widget.child,
     );
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is no longer needed to free up resources.
     controller.dispose();
     super.dispose();
   }

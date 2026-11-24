@@ -1,55 +1,33 @@
 part of '../flutter_ex_kit.dart';
 
-/// Handles the exit logic for a Flutter application.
+/// Handles the double-tap exit logic for a Flutter application.
 ///
-/// This function is used to manage the app's exit behavior when the back button is pressed.
-/// It allows the user to press the back button twice within a 2-second window to exit the app.
+/// Returns the updated [DateTime] timestamp of the back press, which the caller should
+/// store in state (e.g. `_lastBackPressTime = exitApp(currentBackPressTime: _lastBackPressTime);`).
 ///
-/// If the user presses the back button once, it shows a message instructing them to press again.
-/// If the user presses the back button again within the 2-second window, the app will exit.
+/// If [currentBackPressTime] is null or older than [threshold] (defaults to 2 seconds),
+/// [exit] is called (or [notExit]) and the current timestamp is returned.
 ///
-/// Example usage:
-/// ```dart
-/// exitApp(
-///   currentBackPressTime: _lastBackPressTime,
-///   exit: () {
-///     // Custom exit behavior (if needed)
-///   },
-/// );
-/// ```
-///
-/// Parameters:
-/// - [currentBackPressTime]: The time when the back button was last pressed. This should be
-///   updated with the current time on each back button press to track the time difference.
-/// - [exit]: An optional callback function that will be executed if the back button is pressed
-///   for the first time. If not provided, a default message will be shown.
-/// - [notExit]: An optional callback that will be executed when the user chooses not to exit.
-///
-/// If the [currentBackPressTime] is null or the time difference since the last press is greater
-/// than 2 seconds, it will update the [currentBackPressTime] and either call the [exit] callback
-/// or show a default message using the [output] function. If the time difference is less than
-/// 2 seconds, it will exit the app using [SystemNavigator.pop].
-void exitApp({
+/// If the back press occurs within [threshold], the app exits using [SystemNavigator.pop].
+DateTime exitApp({
   DateTime? currentBackPressTime,
   VoidCallback? exit,
   VoidCallback? notExit,
+  Duration threshold = const Duration(seconds: 2),
 }) {
-  DateTime now = DateTime.now();
+  final now = DateTime.now();
 
-  // If it's been more than 2 seconds since the last press
-  if (currentBackPressTime == null ||
-      now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
-    // Update the time of the last press
-    currentBackPressTime = now;
-
-    // Execute custom exit behavior or fallback to default
+  // If it's been more than threshold since the last press (or first press)
+  if (currentBackPressTime == null || now.difference(currentBackPressTime) > threshold) {
     if (exit != null) {
       exit.call();
     } else {
-      notExit?.call(); // Calls the notExit callback if provided
+      notExit?.call();
     }
-  } else {
-    // Exit the app if the second press is within 2 seconds
-    SystemNavigator.pop(); // Exits the app
+    return now;
   }
+
+  // Second press within threshold -> exit the app
+  SystemNavigator.pop();
+  return now;
 }

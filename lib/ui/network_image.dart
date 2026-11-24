@@ -38,10 +38,14 @@ extension NetworkImageExt on String? {
     double? indicatorWidth,
     Widget? svgImage,
   }) {
+    final rawUrl = this;
+    if (rawUrl == null || rawUrl.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    if (this != null && this?.isNotEmpty == true && allImages(this ?? '')) {
+    if (allImages(rawUrl)) {
       return Image.network(
-        this ?? '',
+        rawUrl,
         fit: fit,
         height: height,
         width: width,
@@ -74,10 +78,14 @@ extension NetworkImageExt on String? {
           );
         },
       );
-    } else if (this != null &&
-        this?.isNotEmpty == true &&
-        this!.endsWith('.${FileTypeForImageEnum.svg}')) {
-      return svgImage ?? const SizedBox.shrink();
+    } else {
+      final uri = Uri.tryParse(rawUrl);
+      final path = (uri != null && uri.hasAbsolutePath)
+          ? uri.path.toLowerCase()
+          : rawUrl.toLowerCase();
+      if (path.endsWith('.${FileTypeForImageEnum.svg}')) {
+        return svgImage ?? const SizedBox.shrink();
+      }
     }
 
     return const SizedBox.shrink();
@@ -86,17 +94,23 @@ extension NetworkImageExt on String? {
 
 /// Checks if a given string represents a valid image file format.
 ///
-/// This function verifies if the file name ends with one of the supported image formats
-/// (PNG, JPG, JPEG, WEBP, GIF).
+/// This function verifies if the file name or URL ends with one of the supported
+/// image formats (PNG, JPG, JPEG, WEBP, GIF), safely ignoring query parameters.
 ///
 /// ### Parameters:
 /// - [image]: The file name or URL to be checked.
 ///
 /// ### Returns:
 /// `true` if the file is an image format, otherwise `false`.
-bool allImages(String image) =>
-    image.endsWith('.${FileTypeForImageEnum.png}') ||
-    image.endsWith('.${FileTypeForImageEnum.jpg}') ||
-    image.endsWith('.${FileTypeForImageEnum.jpeg}') ||
-    image.endsWith('.${FileTypeForImageEnum.webp}') ||
-    image.endsWith('.${FileTypeForImageEnum.gif}');
+bool allImages(String image) {
+  final uri = Uri.tryParse(image);
+  final path = (uri != null && uri.hasAbsolutePath)
+      ? uri.path.toLowerCase()
+      : image.toLowerCase();
+
+  return path.endsWith('.${FileTypeForImageEnum.png}') ||
+      path.endsWith('.${FileTypeForImageEnum.jpg}') ||
+      path.endsWith('.${FileTypeForImageEnum.jpeg}') ||
+      path.endsWith('.${FileTypeForImageEnum.webp}') ||
+      path.endsWith('.${FileTypeForImageEnum.gif}');
+}

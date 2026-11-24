@@ -1,46 +1,43 @@
 import 'package:flutter/services.dart';
 
 /// A custom [TextInputFormatter] that prevents consecutive spaces
-/// and ensures that a single space is only allowed between words.
+/// and ensures that only a single space is allowed between words.
 ///
-/// This formatter helps maintain clean and structured user input
-/// by restricting multiple consecutive spaces.
+/// This formatter is stateless and safe against copy-pasting multi-space text
+/// as well as cursor repositioning.
 class SingleSpaceFormatter extends TextInputFormatter {
-  /// Tracks whether the last entered character was a space.
-  ///
-  /// This prevents multiple consecutive spaces in the text input.
-  bool _isPreviousSpace = false;
-
-  /// Formats the text input by allowing only a single space between words.
-  ///
-  /// - If the new input contains only a space, the previous value is retained.
-  /// - If a space is entered consecutively, it is ignored.
-  /// - Otherwise, the input is updated normally.
-  ///
-  /// **Parameters:**
-  /// - [oldValue]: The previous text input value.
-  /// - [newValue]: The updated text input value.
-  ///
-  /// **Returns:**
-  /// A [TextEditingValue] that ensures only single spaces are allowed.
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // If the input is just a leading space, reject it
     if (newValue.text == ' ') {
-      // If only a space is entered, keep the previous value
       return oldValue;
     }
 
-    // Allow a single space only if not preceded by another space
-    if (newValue.text == ' ' && _isPreviousSpace) {
-      return TextEditingValue(
-        text: oldValue.text,
-        selection: TextSelection.collapsed(offset: oldValue.text.length),
-      );
+    var sanitized = newValue.text;
+
+    // Disallow leading spaces
+    if (sanitized.startsWith(' ')) {
+      sanitized = sanitized.trimLeft();
     }
 
-    // Update the flag based on the last character
-    _isPreviousSpace = newValue.text.endsWith(' ');
-    return newValue;
+    // Collapse multiple consecutive spaces into a single space
+    sanitized = sanitized.replaceAll(RegExp(r' {2,}'), ' ');
+
+    if (sanitized == newValue.text) {
+      return newValue;
+    }
+
+    // Preserve cursor position relative to the sanitized text
+    final lengthDiff = newValue.text.length - sanitized.length;
+    final newOffset =
+        (newValue.selection.end - lengthDiff).clamp(0, sanitized.length);
+
+    return TextEditingValue(
+      text: sanitized,
+      selection: TextSelection.collapsed(offset: newOffset),
+    );
   }
 }

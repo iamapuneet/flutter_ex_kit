@@ -105,13 +105,40 @@ void main() {
   });
 
   group('Validation Rules', () {
-    test('SingleSpaceFormatter prevents consecutive spaces', () {
+    test('SingleSpaceFormatter prevents multiple consecutive and leading spaces', () {
       final formatter = SingleSpaceFormatter();
-      const oldValue = TextEditingValue(text: 'Hello ');
-      const newValue = TextEditingValue(text: 'Hello  ');
+      const oldValue = TextEditingValue(text: 'Hello');
+      const newValue = TextEditingValue(
+        text: 'Hello   World',
+        selection: TextSelection.collapsed(offset: 13),
+      );
 
       final result = formatter.formatEditUpdate(oldValue, newValue);
-      expect(result.text, 'Hello ');
+      expect(result.text, 'Hello World');
+    });
+  });
+
+  group('Image URL Validation', () {
+    test('allImages handles URLs with query parameters correctly', () {
+      expect(allImages('https://cdn.example.com/avatar.png?width=200&v=1'), isTrue);
+      expect(allImages('https://cdn.example.com/photo.jpeg?token=abc'), isTrue);
+      expect(allImages('https://cdn.example.com/image.webp'), isTrue);
+      expect(allImages('https://cdn.example.com/document.pdf?v=1'), isFalse);
+    });
+  });
+
+  group('Exit App Logic', () {
+    test('exitApp returns updated DateTime timestamp', () {
+      var firstPressCalled = false;
+      final time1 = exitApp(
+        currentBackPressTime: null,
+        exit: () {
+          firstPressCalled = true;
+        },
+      );
+
+      expect(firstPressCalled, isTrue);
+      expect(time1, isNotNull);
     });
   });
 }
