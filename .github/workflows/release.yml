@@ -1,0 +1,98 @@
+name: Release & Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      publish_to_pub:
+        description: 'Publish package to pub.dev'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build_and_release:
+    name: Build & GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Tests
+        run: flutter test
+
+      - name: Validate Package Quality
+        run: dart pub publish --dry-run
+
+      - name: Extract Package Version
+        id: get_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG_NAME="${{ github.ref_name }}"
+          else
+            TAG_NAME="v$VERSION"
+          fi
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Prepare Distribution Archives
+        run: |
+          mkdir -p dist
+          tar -czvf dist/flutter_ex_kit.tar.gz --exclude='.git' --exclude='.github' --exclude='dist' .
+          zip -r dist/flutter_ex_kit.zip . -x '*.git*' '*.github*' 'dist/*'
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.TAG_NAME }}
+          name: Release ${{ steps.get_version.outputs.TAG_NAME }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            dist/flutter_ex_kit.tar.gz
+            dist/flutter_ex_kit.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_pub_dev:
+    name: Publish to pub.dev
+    needs: build_and_release
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish_to_pub == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Dart / Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Publish to pub.dev
+        run: dart pub publish --force
