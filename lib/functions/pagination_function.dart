@@ -1,5 +1,8 @@
 part of '../flutter_ex_kit.dart';
 
+/// Internal flag to prevent simultaneous duplicate pagination triggers.
+bool _isPaginationLocked = false;
+
 /// Adds pagination functionality to a scrollable widget.
 ///
 /// This function allows you to trigger a callback function when the user scrolls
@@ -28,18 +31,17 @@ part of '../flutter_ex_kit.dart';
 /// The [paginationFunction] attaches a listener to the provided [ScrollController],
 /// which checks if the current scroll offset has reached the maximum scroll extent.
 /// When this condition is met, it calls the provided callback function [fun].
-bool _isPaginationLocked = false;
-
 void paginationFunction({
   required Function() fun,
   required ScrollController controller,
 }) {
   controller.addListener(() {
-    if (controller.position.maxScrollExtent == controller.offset && !_isPaginationLocked) {
+    if (controller.position.maxScrollExtent == controller.offset &&
+        !_isPaginationLocked) {
       _isPaginationLocked = true;
       fun.call();
       // Optional: Add a small delay to unlock or unlock after async completes
-      Future.delayed(Duration(milliseconds: 300), () {
+      Future.delayed(const Duration(milliseconds: 300), () {
         _isPaginationLocked = false;
       });
     }
